@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import BottomNav from "./components/BottomNav";
 
 // Pages existantes
 import Landing from "./pages/Landing";
@@ -52,6 +53,9 @@ export default function App() {
         {/* Pages ministère */}
         <Route path="/ministry-reporting" element={<MinistryReporting />} />
       </Routes>
+
+      {/* Navbar mobile fixe en bas — visible sur toutes les pages */}
+      <BottomNav />
     </Router>
   );
 }

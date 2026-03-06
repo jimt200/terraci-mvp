@@ -1,13 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>terreci-prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#FF8C00" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="TerraCi" />
+
+    <!-- SEO -->
+    <meta name="description" content="Plateforme de sécurisation foncière en Côte d'Ivoire. Achetez votre terrain en toute sécurité." />
+    <meta name="keywords" content="terrain, foncier, Côte d'Ivoire, Abidjan, immobilier, sécurisation" />
+
+    <!-- Icônes Apple -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+
+    <title>TerraCi — Sécurisation Foncière Côte d'Ivoire</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Enregistrement du Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js")
+            .then(() => console.log("TerraCi PWA prête ✅"))
+            .catch((err) => console.log("SW erreur:", err));
+        });
+      }
+    </script>
   </body>
 </html>

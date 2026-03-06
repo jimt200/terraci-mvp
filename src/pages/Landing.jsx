@@ -1,8 +1,32 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export default function Landing() {
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  useEffect(() => {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    });
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
+    }
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const result = await installPrompt.userChoice;
+    if (result.outcome === "accepted") {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
@@ -18,18 +42,63 @@ export default function Landing() {
             <span className="text-yellow-300">toute sécurité</span> en Côte d'Ivoire
           </h1>
           <p className="text-lg text-orange-100 mb-10 max-w-2xl mx-auto">
-            TerraCi sécurise chaque transaction foncière. Projets vérifiés, opérateurs certifiés, documents authentifiés.
+            TerraCi sécurise chaque transaction foncière. Projets vérifiés,
+            opérateurs certifiés, documents authentifiés.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/search" className="bg-white text-orange-600 font-semibold px-8 py-3 rounded-xl hover:bg-orange-50 transition-colors">
+            <Link
+              to="/search"
+              className="bg-white text-orange-600 font-semibold px-8 py-3 rounded-xl hover:bg-orange-50 transition-colors"
+            >
               🔍 Chercher un terrain
             </Link>
-            <Link to="/advanced-search" className="bg-orange-700 text-white font-semibold px-8 py-3 rounded-xl hover:bg-orange-800 transition-colors">
+            <Link
+              to="/advanced-search"
+              className="bg-orange-700 text-white font-semibold px-8 py-3 rounded-xl hover:bg-orange-800 transition-colors"
+            >
               🎯 Recherche avancée
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Bandeau installation PWA */}
+      {!isInstalled && (
+        <section className="bg-gray-900 text-white py-4 px-4">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-lg font-bold shrink-0">
+                T
+              </div>
+              <div>
+                <p className="font-semibold text-sm">
+                  Installer TerraCi sur votre téléphone
+                </p>
+                <p className="text-xs text-gray-400">
+                  Accès rapide depuis votre écran d'accueil, fonctionne hors ligne
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              {installPrompt ? (
+                <button
+                  onClick={handleInstall}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors"
+                >
+                  📲 Installer l'app
+                </button>
+              ) : (
+                <div className="text-xs text-gray-400 text-center">
+                  <p className="font-medium text-white mb-1">
+                    Sur iPhone (Safari) :
+                  </p>
+                  <p>Bouton Partager → "Sur l'écran d'accueil"</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Stats */}
       <section className="bg-gray-900 text-white py-10 px-4">
@@ -52,8 +121,12 @@ export default function Landing() {
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Choisissez votre espace</h2>
-            <p className="text-gray-500 mt-2">TerraCi s'adapte à chaque acteur du marché foncier</p>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Choisissez votre espace
+            </h2>
+            <p className="text-gray-500 mt-2">
+              TerraCi s'adapte à chaque acteur du marché foncier
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -95,11 +168,15 @@ export default function Landing() {
                 to={card.to}
                 className={`bg-white rounded-2xl border-2 p-6 transition-all hover:shadow-lg group ${card.color}`}
               >
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl text-2xl mb-4 ${card.badge}`}>
+                <div
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl text-2xl mb-4 ${card.badge}`}
+                >
                   {card.icon}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{card.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{card.desc}</p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {card.desc}
+                </p>
                 <div className="mt-4 text-sm font-medium text-orange-500 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                   Accéder →
                 </div>
@@ -113,17 +190,51 @@ export default function Landing() {
       <section className="py-16 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Tout ce dont vous avez besoin</h2>
-            <p className="text-gray-500 mt-2">Une plateforme complète pour chaque étape de votre projet</p>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Tout ce dont vous avez besoin
+            </h2>
+            <p className="text-gray-500 mt-2">
+              Une plateforme complète pour chaque étape de votre projet
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { to: "/search", icon: "🔍", title: "Recherche de projets", desc: "Parcourez les projets fonciers vérifiés par région, budget et superficie" },
-              { to: "/advanced-search", icon: "🎯", title: "Filtres avancés", desc: "Affinez votre recherche avec des critères précis : prix, statut, opérateur" },
-              { to: "/comparator", icon: "⚖️", title: "Comparateur", desc: "Comparez jusqu'à 3 projets côte à côte pour faire le meilleur choix" },
-              { to: "/create-project", icon: "📁", title: "Dépôt de dossier", desc: "Soumettez votre projet en 5 étapes avec tous les documents requis" },
-              { to: "/validation-queue", icon: "✅", title: "Validation officielle", desc: "Chaque projet est examiné et validé par un administrateur certifié" },
-              { to: "/ministry-reporting", icon: "📊", title: "Rapports officiels", desc: "Génération de rapports de conformité pour le Ministère de tutelle" },
+              {
+                to: "/search",
+                icon: "🔍",
+                title: "Recherche de projets",
+                desc: "Parcourez les projets fonciers vérifiés par région, budget et superficie",
+              },
+              {
+                to: "/advanced-search",
+                icon: "🎯",
+                title: "Filtres avancés",
+                desc: "Affinez votre recherche avec des critères précis : prix, statut, opérateur",
+              },
+              {
+                to: "/comparator",
+                icon: "⚖️",
+                title: "Comparateur",
+                desc: "Comparez jusqu'à 3 projets côte à côte pour faire le meilleur choix",
+              },
+              {
+                to: "/create-project",
+                icon: "📁",
+                title: "Dépôt de dossier",
+                desc: "Soumettez votre projet en 5 étapes avec tous les documents requis",
+              },
+              {
+                to: "/validation-queue",
+                icon: "✅",
+                title: "Validation officielle",
+                desc: "Chaque projet est examiné et validé par un administrateur certifié",
+              },
+              {
+                to: "/ministry-reporting",
+                icon: "📊",
+                title: "Rapports officiels",
+                desc: "Génération de rapports de conformité pour le Ministère de tutelle",
+              },
             ].map((f) => (
               <Link
                 key={f.to}
@@ -131,9 +242,129 @@ export default function Landing() {
                 className="p-6 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50 transition-all group"
               >
                 <div className="text-3xl mb-3">{f.icon}</div>
-                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">{f.title}</h3>
+                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">
+                  {f.title}
+                </h3>
                 <p className="text-sm text-gray-500">{f.desc}</p>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Processus en 3 étapes */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Comment ça marche ?
+            </h2>
+            <p className="text-gray-500 mt-2">
+              3 étapes simples pour sécuriser votre achat
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                icon: "🔍",
+                title: "Recherchez",
+                desc: "Parcourez les projets certifiés, filtrez par région et budget, comparez vos favoris.",
+                color: "text-blue-500",
+                bg: "bg-blue-50",
+              },
+              {
+                step: "02",
+                icon: "📋",
+                title: "Vérifiez",
+                desc: "Consultez les documents officiels, l'historique de l'opérateur et le statut de validation.",
+                color: "text-orange-500",
+                bg: "bg-orange-50",
+              },
+              {
+                step: "03",
+                icon: "🔐",
+                title: "Sécurisez",
+                desc: "Finalisez votre achat avec l'accompagnement de TerraCi et recevez vos documents certifiés.",
+                color: "text-green-600",
+                bg: "bg-green-50",
+              },
+            ].map((item, i) => (
+              <div key={i} className="text-center">
+                <div
+                  className={`w-16 h-16 ${item.bg} rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4`}
+                >
+                  {item.icon}
+                </div>
+                <div className={`text-sm font-bold ${item.color} mb-2`}>
+                  ÉTAPE {item.step}
+                </div>
+                <h3 className="font-bold text-gray-900 text-lg mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Témoignages */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Ils nous font confiance
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                nom: "Kouamé A.",
+                role: "Acheteur — Abidjan",
+                texte:
+                  "J'ai trouvé mon terrain à Cocody en moins d'une semaine. Tous les documents étaient vérifiés, j'étais rassuré.",
+                note: 5,
+              },
+              {
+                nom: "Traoré F.",
+                role: "Opérateur — Bouaké",
+                texte:
+                  "La plateforme m'a permis de toucher beaucoup plus d'acheteurs sérieux. La validation donne de la crédibilité à mes projets.",
+                note: 5,
+              },
+              {
+                nom: "N'Guessan P.",
+                role: "Acheteur — Grand-Bassam",
+                texte:
+                  "Enfin une solution pour éviter les arnaques foncières ! Le comparateur de projets est excellent.",
+                note: 4,
+              },
+            ].map((t, i) => (
+              <div
+                key={i}
+                className="bg-gray-50 rounded-2xl p-6 border border-gray-100"
+              >
+                <div className="flex items-center gap-1 mb-3">
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <span
+                      key={j}
+                      className={j < t.note ? "text-yellow-400" : "text-gray-200"}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  "{t.texte}"
+                </p>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{t.nom}</p>
+                  <p className="text-xs text-gray-400">{t.role}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -142,15 +373,24 @@ export default function Landing() {
       {/* CTA final */}
       <section className="py-16 px-4 bg-gradient-to-r from-green-700 to-green-800 text-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Prêt à sécuriser votre foncier ?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Prêt à sécuriser votre foncier ?
+          </h2>
           <p className="text-green-200 mb-8">
-            Rejoignez les centaines d'acheteurs et d'opérateurs qui font confiance à TerraCi
+            Rejoignez les centaines d'acheteurs et d'opérateurs qui font
+            confiance à TerraCi
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/search" className="bg-white text-green-700 font-semibold px-8 py-3 rounded-xl hover:bg-green-50 transition-colors">
+            <Link
+              to="/search"
+              className="bg-white text-green-700 font-semibold px-8 py-3 rounded-xl hover:bg-green-50 transition-colors"
+            >
               Voir les projets disponibles
             </Link>
-            <Link to="/create-project" className="bg-green-600 text-white font-semibold px-8 py-3 rounded-xl border border-green-500 hover:bg-green-500 transition-colors">
+            <Link
+              to="/create-project"
+              className="bg-green-600 text-white font-semibold px-8 py-3 rounded-xl border border-green-500 hover:bg-green-500 transition-colors"
+            >
               Déposer mon projet
             </Link>
           </div>

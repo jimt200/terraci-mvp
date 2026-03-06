@@ -20,6 +20,7 @@ import DetailedExam from "./pages/DetailedExam";
 import ManageOperators from "./pages/ManageOperators";
 import DashboardMinistry from "./pages/DashboardMinistry";
 import MinistryReporting from "./pages/MinistryReporting";
+import OperatorProfile from "./pages/OperatorProfile";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         {/* Pages opérateur */}
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/manage-lots/:id" element={<ManageLots />} />
+        <Route path="/operator/:id" element={<OperatorProfile />} />
 
         {/* Pages acheteur */}
         <Route path="/my-purchases/:id" element={<MyPurchasesDetail />} />

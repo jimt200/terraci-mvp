@@ -12,14 +12,14 @@ const ETAPES = [
 ];
 
 const DOCUMENTS_REQUIS = [
-  { id: 1, nom: "Titre foncier", obligatoire: true, description: "Document officiel attestant la propriété du terrain" },
-  { id: 2, nom: "Plan de lotissement", obligatoire: true, description: "Plan certifié par un géomètre agréé" },
-  { id: 3, nom: "Arrêté de morcellement", obligatoire: true, description: "Autorisation officielle de morcellement" },
-  { id: 4, nom: "Étude d'impact environnemental", obligatoire: true, description: "Étude EIE validée par le ministère" },
-  { id: 5, nom: "Registre de commerce", obligatoire: true, description: "RC de la société opératrice" },
-  { id: 6, nom: "Attestation fiscale", obligatoire: true, description: "Attestation de régularité fiscale" },
-  { id: 7, nom: "Plan de viabilisation", obligatoire: false, description: "Plan des réseaux eau, électricité, voirie" },
-  { id: 8, nom: "Convention de vente type", obligatoire: false, description: "Modèle de contrat de vente proposé aux acheteurs" },
+  { id: 1, nom: "Approbation du projet", obligatoire: true, description: "Arrêté d'approbation officiel du projet de lotissement (cochez si approuvé et renseignez le numéro)" },
+  { id: 2, nom: "Attestation villageoise", obligatoire: true, description: "Attestation délivrée par le chef de village ou la communauté locale" },
+  { id: 3, nom: "Lettre d'attribution", obligatoire: true, description: "Lettre officielle d'attribution du terrain par l'autorité compétente" },
+  { id: 4, nom: "ACD (Arrêté de Concession Définitive)", obligatoire: true, description: "Document attestant la concession définitive du terrain" },
+  { id: 5, nom: "ACP (Arrêté de Concession Provisoire)", obligatoire: false, description: "Document de concession provisoire si l'ACD n'est pas encore disponible" },
+  { id: 6, nom: "Titre Foncier", obligatoire: true, description: "Titre foncier définitif enregistré au livre foncier" },
+  { id: 7, nom: "Attestation Foncière", obligatoire: false, description: "Attestation provisoire en attente du titre foncier définitif" },
+  { id: 8, nom: "Permis de lotir", obligatoire: true, description: "Autorisation administrative de procéder au lotissement" },
 ];
 
 export default function CreateProject() {
@@ -32,6 +32,7 @@ export default function CreateProject() {
     adresse: "", coordLat: "", coordLng: "",
     lots_total: "", superficie_totale: "", prix_min: "", prix_max: "",
     features: [],
+    planLotissement: null,
     documents: DOCUMENTS_REQUIS.map((d) => ({ ...d, fichier: null, coché: false })),
   });
 
@@ -305,9 +306,9 @@ export default function CreateProject() {
             <div className="space-y-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="font-bold text-gray-900 text-lg">Documents du projet</h2>
+                  <h2 className="font-bold text-gray-900 text-lg">Documents administratifs</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    Uploadez les documents officiels. Les documents obligatoires sont requis pour la validation.
+                    Cochez les documents que vous possédez. Seul le nom sera visible par les acheteurs — les documents seront examinés par l'administrateur TerraCi.
                   </p>
                 </div>
                 <div className="shrink-0 text-center bg-orange-50 rounded-xl px-4 py-2 border border-orange-200">
@@ -316,10 +317,10 @@ export default function CreateProject() {
                 </div>
               </div>
 
-              {/* Barre de progression */}
+              {/* Barre progression */}
               <div>
                 <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>Progression</span>
+                  <span>Documents obligatoires fournis</span>
                   <span>{Math.round((docsCompletes / docsObligatoires.length) * 100)}%</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2">
@@ -329,62 +330,74 @@ export default function CreateProject() {
                 </div>
               </div>
 
-              {/* Liste documents */}
               <div className="space-y-3">
                 {form.documents.map((doc) => (
                   <div key={doc.id}
-                    className={`border rounded-xl p-4 transition-colors ${
-                      doc.fichier ? "border-green-200 bg-green-50" :
-                      doc.obligatoire ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-white"
+                    className={`border rounded-xl p-4 transition-all ${
+                      doc.coché && doc.fichier ? "border-green-300 bg-green-50" :
+                      doc.coché ? "border-orange-200 bg-orange-50" :
+                      doc.obligatoire ? "border-gray-200 bg-white" : "border-gray-100 bg-gray-50"
                     }`}>
                     <div className="flex items-start gap-3">
-                      {/* Checkbox statut */}
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                        doc.fichier ? "bg-green-500" : "bg-gray-200"
-                      }`}>
-                        {doc.fichier
-                          ? <span className="text-white text-xs font-bold">✓</span>
-                          : <span className="text-gray-400 text-xs">{doc.id}</span>
-                        }
-                      </div>
+
+                      {/* Checkbox cocher = "je possède ce document" */}
+                      <label className="mt-0.5 shrink-0 cursor-pointer">
+                        <input type="checkbox" checked={doc.coché}
+                          onChange={(e) => updateDocument(doc.id, "coché", e.target.checked)}
+                          className="accent-orange-500 w-4 h-4 rounded" />
+                      </label>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm font-semibold text-gray-800">{doc.nom}</p>
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <p className={`text-sm font-semibold ${doc.coché ? "text-gray-900" : "text-gray-500"}`}>
+                            {doc.nom}
+                          </p>
                           {doc.obligatoire
                             ? <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-medium">Obligatoire</span>
                             : <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">Optionnel</span>
                           }
+                          {doc.coché && !doc.fichier && (
+                            <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded">✓ Déclaré</span>
+                          )}
+                          {doc.fichier && (
+                            <span className="text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">📎 Uploadé</span>
+                          )}
                         </div>
-                        <p className="text-xs text-gray-400 mb-3">{doc.description}</p>
+                        <p className="text-xs text-gray-400 mb-2">{doc.description}</p>
 
-                        {/* Zone upload */}
-                        {doc.fichier ? (
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-green-200">
-                            <div className="flex items-center gap-2">
-                              <span className="text-green-500">📄</span>
-                              <span className="text-xs text-gray-700 truncate max-w-[180px]">{doc.fichier.name}</span>
-                            </div>
-                            <button
-                              onClick={() => handleFileUpload(doc.id, null)}
-                              className="text-red-400 hover:text-red-600 text-xs ml-2 shrink-0"
-                            >
-                              ✕ Supprimer
-                            </button>
-                          </div>
-                        ) : (
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <div className="flex-1 border-2 border-dashed border-gray-300 hover:border-orange-400 rounded-lg px-4 py-3 text-center transition-colors hover:bg-orange-50">
-                              <p className="text-xs text-gray-400">📎 Cliquer pour uploader le PDF</p>
-                              <p className="text-xs text-gray-300 mt-0.5">PDF, max 10 MB</p>
-                            </div>
-                            <input
-                              type="file"
-                              accept=".pdf,.jpg,.jpeg,.png"
-                              className="hidden"
-                              onChange={(e) => e.target.files[0] && handleFileUpload(doc.id, e.target.files[0])}
+                        {/* Champ spécial : n° arrêté si approuvé */}
+                        {doc.id === 1 && doc.coché && (
+                          <div className="mb-3">
+                            <input type="text"
+                              placeholder="N° de l'arrêté d'approbation (si disponible)"
+                              className="w-full border border-orange-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
                             />
-                          </label>
+                          </div>
+                        )}
+
+                        {/* Zone upload — visible seulement si coché */}
+                        {doc.coché && (
+                          doc.fichier ? (
+                            <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-green-200">
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-500">📄</span>
+                                <span className="text-xs text-gray-700 truncate max-w-[180px]">{doc.fichier.name}</span>
+                              </div>
+                              <button onClick={() => handleFileUpload(doc.id, null)}
+                                className="text-red-400 hover:text-red-600 text-xs ml-2 shrink-0">
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <div className="flex-1 border-2 border-dashed border-gray-300 hover:border-orange-400 rounded-lg px-4 py-2.5 text-center transition-colors hover:bg-orange-50">
+                                <p className="text-xs text-gray-400">📎 Uploader le PDF (optionnel mais recommandé)</p>
+                                <p className="text-xs text-gray-300 mt-0.5">PDF, max 10 MB</p>
+                              </div>
+                              <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+                                onChange={(e) => e.target.files[0] && handleFileUpload(doc.id, e.target.files[0])} />
+                            </label>
+                          )
                         )}
                       </div>
                     </div>
@@ -392,12 +405,45 @@ export default function CreateProject() {
                 ))}
               </div>
 
+              {/* Plan de lotissement PDF — section spéciale */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🗺️</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-blue-800 mb-1">Plan de lotissement (PDF)</h3>
+                    <p className="text-xs text-blue-600 mb-3">
+                      Ce document sera visible par les acheteurs dans les détails du projet pour qu'ils puissent identifier l'emplacement des lots disponibles avant achat.
+                    </p>
+                    {form.planLotissement ? (
+                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-blue-200">
+                        <div className="flex items-center gap-2">
+                          <span className="text-blue-500">📄</span>
+                          <span className="text-xs text-gray-700">{form.planLotissement.name}</span>
+                        </div>
+                        <button onClick={() => updateForm("planLotissement", null)}
+                          className="text-red-400 hover:text-red-600 text-xs">✕</button>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer block">
+                        <div className="border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-lg px-4 py-3 text-center transition-colors hover:bg-blue-50">
+                          <p className="text-xs text-blue-500 font-medium">📎 Uploader le plan de lotissement PDF</p>
+                          <p className="text-xs text-blue-300 mt-0.5">Visible par les acheteurs · PDF max 20 MB</p>
+                        </div>
+                        <input type="file" accept=".pdf" className="hidden"
+                          onChange={(e) => e.target.files[0] && updateForm("planLotissement", e.target.files[0])} />
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {!peutSoumettre && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-sm text-yellow-700">
-                  ⚠️ Il vous manque encore {docsObligatoires.length - docsCompletes} document(s) obligatoire(s) pour pouvoir soumettre.
+                  ⚠️ Veuillez cocher les {docsObligatoires.length - docsCompletes} document(s) obligatoire(s) manquants.
                 </div>
               )}
             </div>
+          
           )}
 
           {/* ÉTAPE 5 — Récapitulatif */}

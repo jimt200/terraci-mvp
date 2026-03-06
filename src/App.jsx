@@ -1,48 +1,57 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
-import Search from './pages/Search';
-import ProjectDetail from './pages/ProjectDetail';
-import DashboardOperator from './pages/DashboardOperator';
-import DashboardBuyer from './pages/DashboardBuyer';
-import DashboardAdmin from './pages/DashboardAdmin';
-import CreateProject from './pages/CreateProject';
-import ManageLots from './pages/ManageLots';
-import AdvancedSearch from './pages/AdvancedSearch';
-import ProjectComparator from './pages/ProjectComparator';
-import MyPurchasesDetail from './pages/MyPurchasesDetail';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-function App() {
+// Pages existantes
+import Landing from "./pages/Landing";
+import Search from "./pages/Search";
+import ProjectDetail from "./pages/ProjectDetail";
+import DashboardOperator from "./pages/DashboardOperator";
+import DashboardBuyer from "./pages/DashboardBuyer";
+import DashboardAdmin from "./pages/DashboardAdmin";
+import CreateProject from "./pages/CreateProject";
+import ManageLots from "./pages/ManageLots";
+import AdvancedSearch from "./pages/AdvancedSearch";
+import ProjectComparator from "./pages/ProjectComparator";
+import MyPurchasesDetail from "./pages/MyPurchasesDetail";
+
+// Nouvelles pages
+import ValidationQueue from "./pages/ValidationQueue";
+import DetailedExam from "./pages/DetailedExam";
+import ManageOperators from "./pages/ManageOperators";
+import DashboardMinistry from "./pages/DashboardMinistry";
+import MinistryReporting from "./pages/MinistryReporting";
+
+export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Pages Publiques */}
+        {/* Pages publiques */}
         <Route path="/" element={<Landing />} />
         <Route path="/search" element={<Search />} />
         <Route path="/project/:id" element={<ProjectDetail />} />
-        
-        {/* Portail Opérateur */}
-        <Route path="/dashboard-operator" element={<DashboardOperator />} />
-        <Route path="/create-project" element={<CreateProject />} />
-        <Route path="/manage-lots/:id?" element={<ManageLots />} />
-        
-        {/* Portail Acheteur */}
-        <Route path="/dashboard-buyer" element={<DashboardBuyer />} />
         <Route path="/advanced-search" element={<AdvancedSearch />} />
-        <Route path="/compare" element={<ProjectComparator />} />
-        <Route path="/my-purchase/:id?" element={<MyPurchasesDetail />} />
-        
-        {/* Portail Admin */}
+        <Route path="/comparator" element={<ProjectComparator />} />
+
+        {/* Dashboards */}
+        <Route path="/dashboard-operator" element={<DashboardOperator />} />
+        <Route path="/dashboard-buyer" element={<DashboardBuyer />} />
         <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-        
-        {/* TODO: 5 pages restantes à ajouter dans la prochaine session */}
-        {/* - ValidationQueue */}
-        {/* - DetailedExam */}
-        {/* - ManageOperators */}
-        {/* - DashboardMinistry */}
-        {/* - MinistryReporting */}
+        <Route path="/dashboard-ministry" element={<DashboardMinistry />} />
+
+        {/* Pages opérateur */}
+        <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/manage-lots/:id" element={<ManageLots />} />
+
+        {/* Pages acheteur */}
+        <Route path="/my-purchases/:id" element={<MyPurchasesDetail />} />
+
+        {/* Pages admin */}
+        <Route path="/validation-queue" element={<ValidationQueue />} />
+        <Route path="/detailed-exam/:id" element={<DetailedExam />} />
+        <Route path="/manage-operators" element={<ManageOperators />} />
+
+        {/* Pages ministère */}
+        <Route path="/ministry-reporting" element={<MinistryReporting />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;

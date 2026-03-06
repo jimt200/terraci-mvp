@@ -1,146 +1,94 @@
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { projects } from '../data/projects';
-import { PlusCircle, BarChart3, Home, DollarSign, FileText, TrendingUp } from 'lucide-react';
+import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { projects } from "../data/projects";
 
 export default function DashboardOperator() {
-  // Simuler les projets de l'opérateur connecté
-  const operatorProjects = projects.filter(p => p.operator.name === "KOUADIO IMMOBILIER SARL");
-  
-  const stats = {
-    activeProjects: operatorProjects.length,
-    totalLots: operatorProjects.reduce((sum, p) => sum + p.totalLots, 0),
-    soldLots: operatorProjects.reduce((sum, p) => sum + p.soldLots, 0),
-    revenue: "1.2 Milliards"
-  };
+  const mesProjets = projects.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Bienvenue, KOUADIO IMMOBILIER SARL</h1>
-          <p className="text-gray-600">Gérez vos projets de lotissement</p>
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 text-xs font-medium px-3 py-1 rounded-full mb-2">
+              🏗️ Espace Opérateur
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard Opérateur</h1>
+            <p className="text-gray-500 mt-1">Gérez vos projets et vos lots fonciers</p>
+          </div>
+          <Link to="/create-project" className="btn-primary px-5 py-2 text-sm">
+            + Nouveau projet
+          </Link>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <BarChart3 className="w-8 h-8 text-primary" />
-              <span className="text-sm text-gray-500">Projets</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Projets actifs", value: 3, icon: "🏗️", color: "text-orange-600", bg: "bg-orange-50" },
+            { label: "Lots disponibles", value: 87, icon: "🏠", color: "text-blue-600", bg: "bg-blue-50" },
+            { label: "Lots vendus", value: 58, icon: "✅", color: "text-green-600", bg: "bg-green-50" },
+            { label: "En validation", value: 1, icon: "⏳", color: "text-yellow-600", bg: "bg-yellow-50" },
+          ].map((s) => (
+            <div key={s.label} className={`${s.bg} rounded-xl border border-gray-100 p-5 shadow-sm`}>
+              <div className="text-2xl mb-2">{s.icon}</div>
+              <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-gray-500 mt-1">{s.label}</div>
             </div>
-            <div className="text-3xl font-bold mb-1">{stats.activeProjects}</div>
-            <div className="text-sm text-gray-600">Projets Actifs</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <Home className="w-8 h-8 text-primary" />
-              <span className="text-sm text-gray-500">Lots</span>
-            </div>
-            <div className="text-3xl font-bold mb-1">{stats.totalLots}</div>
-            <div className="text-sm text-gray-600">{stats.soldLots} Vendus</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <DollarSign className="w-8 h-8 text-secondary" />
-              <span className="text-sm text-gray-500">Revenus</span>
-            </div>
-            <div className="text-3xl font-bold mb-1">{stats.revenue}</div>
-            <div className="text-sm text-gray-600">FCFA Total</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="w-8 h-8 text-secondary" />
-              <span className="text-sm text-gray-500">Note</span>
-            </div>
-            <div className="text-3xl font-bold mb-1">4.5/5</div>
-            <div className="text-sm text-gray-600">28 Avis</div>
-          </div>
+          ))}
         </div>
 
-        {/* Actions */}
-        <div className="mb-8">
-          <button className="btn-primary flex items-center gap-2">
-            <PlusCircle className="w-5 h-5" />
-            Créer un Nouveau Projet
-          </button>
+        {/* Actions rapides */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          {[
+            { to: "/create-project", icon: "📁", title: "Déposer un projet", desc: "Soumettez un nouveau projet en 5 étapes", btn: "Commencer", primary: true },
+            { to: "/manage-lots/1", icon: "🗂️", title: "Gérer mes lots", desc: "Visualisez et gérez le plan interactif de vos lots", btn: "Accéder", primary: false },
+            { to: "/search", icon: "📊", title: "Voir les projets", desc: "Consultez tous les projets disponibles sur la plateforme", btn: "Explorer", primary: false },
+          ].map((a) => (
+            <div key={a.to} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+              <div className="text-3xl mb-3">{a.icon}</div>
+              <h3 className="font-bold text-gray-900 mb-1">{a.title}</h3>
+              <p className="text-sm text-gray-500 mb-4">{a.desc}</p>
+              <Link to={a.to} className={`${a.primary ? "btn-primary" : "btn-outline"} text-sm px-4 py-2 inline-block`}>
+                {a.btn} →
+              </Link>
+            </div>
+          ))}
         </div>
 
-        {/* Projects List */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold">Vos Projets</h2>
+        {/* Mes projets */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900">Mes projets</h2>
+            <Link to="/create-project" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+              + Nouveau
+            </Link>
           </div>
-          
-          <div className="divide-y divide-gray-200">
-            {operatorProjects.map(project => (
-              <div key={project.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start gap-4">
-                  <img 
-                    src={project.image} 
-                    alt={project.name}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                  
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="text-lg font-bold">{project.name}</h3>
-                        <p className="text-gray-600">{project.location}</p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        project.status === 'En cours' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                      }`}>
-                        {project.status}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-4 mb-4">
-                      <div>
-                        <div className="text-sm text-gray-600">Total Lots</div>
-                        <div className="font-bold">{project.totalLots}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Disponibles</div>
-                        <div className="font-bold text-secondary">{project.availableLots}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Vendus</div>
-                        <div className="font-bold text-primary">{project.soldLots}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Avancement</div>
-                        <div className="font-bold">{project.progress}%</div>
-                      </div>
-                    </div>
-
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                      <div 
-                        className="bg-primary rounded-full h-2"
-                        style={{ width: `${project.progress}%` }}
-                      ></div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button className="btn-outline text-sm py-2 px-4">Modifier</button>
-                      <button className="btn-outline text-sm py-2 px-4">Documents</button>
-                      <button className="btn-outline text-sm py-2 px-4">Lots</button>
-                      <button className="btn-primary text-sm py-2 px-4">Voir Détails</button>
-                    </div>
-                  </div>
+          <div className="divide-y divide-gray-100">
+            {mesProjets.map((p) => (
+              <div key={p.id} className="px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div>
+                  <p className="font-medium text-gray-900">{p.title || p.nom || `Projet #${p.id}`}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{p.ville || p.location} · {p.lots || 0} lots</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Actif</span>
+                  <Link to={`/manage-lots/${p.id}`} className="text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 transition-colors">
+                    Gérer lots →
+                  </Link>
+                  <Link to={`/project/${p.id}`} className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                    Voir →
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
+      </main>
       <Footer />
     </div>
   );

@@ -1,168 +1,101 @@
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { projects } from '../data/projects';
-import { Home, TrendingUp, Heart, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { projects } from "../data/projects";
 
 export default function DashboardBuyer() {
-  // Simuler un achat
-  const purchasedProject = projects[0];
-  const favoriteProjects = projects.slice(1, 4);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Bonjour, Monsieur TOURÉ Amadou</h1>
-          <p className="text-gray-600">Suivez vos investissements fonciers</p>
-        </div>
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
 
-        {/* Quick Search */}
-        <div className="bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl p-8 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Trouvez votre terrain idéal</h2>
-          <Link to="/search" className="btn-secondary inline-flex items-center gap-2">
-            <Search className="w-5 h-5" />
-            Rechercher un Projet
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full mb-2">
+              🏠 Espace Acheteur
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Bonjour, Acheteur 👋</h1>
+            <p className="text-gray-500 mt-1">Trouvez et sécurisez votre terrain idéal</p>
+          </div>
+          <Link to="/search" className="btn-primary px-5 py-2 text-sm">
+            🔍 Chercher un terrain
           </Link>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <Home className="w-8 h-8 text-primary" />
-            </div>
-            <div className="text-3xl font-bold mb-1">1</div>
-            <div className="text-sm text-gray-600">Terrain Acquis</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="w-8 h-8 text-secondary" />
-            </div>
-            <div className="text-3xl font-bold mb-1">60%</div>
-            <div className="text-sm text-gray-600">Avancement Moyen</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <Heart className="w-8 h-8 text-red-500" />
-            </div>
-            <div className="text-3xl font-bold mb-1">{favoriteProjects.length}</div>
-            <div className="text-sm text-gray-600">Projets Favoris</div>
-          </div>
+        {/* Actions rapides */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { to: "/search", icon: "🔍", title: "Rechercher", desc: "Parcourez les projets disponibles", color: "border-blue-200 hover:border-blue-400" },
+            { to: "/advanced-search", icon: "🎯", title: "Recherche avancée", desc: "Filtres détaillés par budget, région", color: "border-orange-200 hover:border-orange-400" },
+            { to: "/comparator", icon: "⚖️", title: "Comparer", desc: "Comparez 3 projets côte à côte", color: "border-green-200 hover:border-green-400" },
+            { to: "/my-purchases/1", icon: "📦", title: "Mes achats", desc: "Suivez l'avancement de votre dossier", color: "border-purple-200 hover:border-purple-400" },
+          ].map((a) => (
+            <Link
+              key={a.to}
+              to={a.to}
+              className={`bg-white rounded-xl border-2 p-5 transition-all hover:shadow-md group ${a.color}`}
+            >
+              <div className="text-2xl mb-2">{a.icon}</div>
+              <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-orange-600 transition-colors">{a.title}</h3>
+              <p className="text-xs text-gray-500">{a.desc}</p>
+            </Link>
+          ))}
         </div>
 
-        {/* Current Purchase */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Mon Achat en Cours</h2>
-          
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="md:flex">
-              <img 
-                src={purchasedProject.image} 
-                alt={purchasedProject.name}
-                className="w-full md:w-64 h-48 object-cover"
-              />
-              
-              <div className="p-6 flex-1">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">{purchasedProject.name}</h3>
-                    <p className="text-gray-600">{purchasedProject.location}</p>
-                  </div>
-                  <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">
-                    🔄 Travaux en cours
-                  </span>
+        {/* Mon achat en cours */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-900">Mon achat en cours</h2>
+            <Link to="/my-purchases/1" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+              Voir le détail →
+            </Link>
+          </div>
+          <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl">
+            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">🏠</div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-900">Résidence Les Cocotiers — Lot B-12</p>
+              <p className="text-sm text-gray-500">Abidjan · 15 000 000 FCFA</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: "60%" }}></div>
                 </div>
-
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <div className="text-sm text-gray-600">Lot</div>
-                    <div className="font-bold">B-45</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Superficie</div>
-                    <div className="font-bold">420m²</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Prix</div>
-                    <div className="font-bold text-primary">13.5M FCFA</div>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold">Avancement des travaux</span>
-                    <span className="text-primary font-bold">{purchasedProject.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className="bg-primary rounded-full h-3"
-                      style={{ width: `${purchasedProject.progress}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-2">
-                    <span>Bornage ✓</span>
-                    <span>Viabilisation 🔄</span>
-                    <span>Électrification ⏳</span>
-                    <span>Livraison ⏳</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <button className="btn-primary text-sm py-2 px-4">
-                    Voir Progression Détaillée
-                  </button>
-                  <button className="btn-outline text-sm py-2 px-4">
-                    Documents
-                  </button>
-                  <button className="btn-outline text-sm py-2 px-4">
-                    Contacter Opérateur
-                  </button>
-                </div>
+                <span className="text-xs text-gray-500">60% complété</span>
               </div>
             </div>
+            <Link to="/my-purchases/1" className="btn-primary text-xs px-4 py-2 shrink-0">
+              Suivre →
+            </Link>
           </div>
         </div>
 
-        {/* Favorites */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Mes Favoris</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {favoriteProjects.map(project => (
-              <Link 
-                key={project.id} 
-                to={`/project/${project.id}`}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+        {/* Projets suggérés */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900">Projets suggérés</h2>
+            <Link to="/search" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+              Voir tout →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+            {projects.slice(0, 3).map((p) => (
+              <Link
+                key={p.id}
+                to={`/project/${p.id}`}
+                className="p-5 hover:bg-gray-50 transition-colors block"
               >
-                <div className="relative h-48">
-                  <img 
-                    src={project.image} 
-                    alt={project.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                    <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-                  </button>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold mb-1 line-clamp-1">{project.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{project.location}</p>
-                  <div className="text-lg font-bold text-primary">
-                    À partir de {(project.priceMin / 1000000).toFixed(1)}M FCFA
-                  </div>
-                </div>
+                <p className="font-medium text-gray-900 mb-1">{p.title || p.nom || `Projet #${p.id}`}</p>
+                <p className="text-xs text-gray-500 mb-2">{p.ville || p.location}</p>
+                <p className="text-sm font-semibold text-orange-500">
+                  {p.prix_min ? `${(p.prix_min / 1000000).toFixed(0)} M FCFA` : "Prix sur demande"}
+                </p>
+                <span className="text-xs text-orange-500 mt-2 inline-block">Voir le projet →</span>
               </Link>
             ))}
           </div>
         </div>
-      </div>
 
+      </main>
       <Footer />
     </div>
   );
